@@ -9,37 +9,39 @@ For more detailed examples and use cases, check out the files in the how-to-usag
 
 ## Module Inputs
 
-| Description                                     | Type     | Default | Required |
-|-------------------------------------------------|----------|---------|----------|
-| s3_bucket_name                                  | string   | ""      | yes      |
-| enable_default_policy                           | bool     | false   | no       |
-| lifecycle_glacier_ir_object_prefix              | string   | ""      | no       |
-| lifecycle_glacier_ir_transition_enabled         | bool     | false   | no       |
-| lifecycle_days_to_glacier_ir_transition         | number   | 90      | no       |
-| lifecycle_days_to_expiration                     | number   | 30      | no       |
-| lifecycle_days_to_glacier_transition             | number   | 90      | no       |
-| lifecycle_days_to_infrequent_storage_transition  | number   | 60      | no       |
-| lifecycle_expiration_enabled                     | bool     | false   | no       |
-| lifecycle_expiration_object_prefix               | string   | ""      | no       |
-| lifecycle_glacier_object_prefix                  | string   | ""      | no       |
-| lifecycle_glacier_transition_enabled             | bool     | false   | no       |
-| lifecycle_infrequent_storage_object_prefix       | string   | ""      | no       |
-| lifecycle_infrequent_storage_transition_enabled  | bool     | false   | no       |
-| versioning                                      | string   | "Disabled" | no     |
-| kms_master_key_id                                | string   | ""      | no       |
-| custom_iam_s3_policy_statement                   | list(object) | [{}] | no       |
-| force_destroy                                    | bool     | false   | no       |
-| allowed_resource_arns                            | list(string) | []    | no       |
-| enable_restricted_bucket_access                  | bool     | false   | no       |
-| enable_whitelists                                | bool     | false   | no       |
-| generic_policy_entries                           | list(object) | []    | no       |
-| ip_whitelist                                     | list(string) | []    | no       |
-| vpc_ids_whitelist                                | list(string) | []    | no       |
-| ip_whitelist_vpce                                | list(string) | []    | no       |
-| whitelist_actions                                | list(string) | ["s3:PutObject*", "s3:GetObject*"] | no |
-| environment                                      | string   | ""      | no       |
-| enable_deny_unencrypted_object_uploads           | bool     | true    | no       |
-| additional_tags                                  | map(string) | {}    | no       |
+Certainly! Here's the table of inputs for your S3 bucket module with an additional column for "required":
+
+| Variable                                      | Type               | Description                                                                                                 | Default       | Required |
+|-----------------------------------------------|--------------------|-------------------------------------------------------------------------------------------------------------|---------------|----------|
+| s3_bucket_name                                | string             | The name of the bucket                                                                                       | ""            | Yes      |
+| enable_default_policy                         | bool               | Enable or disable the default IAM policy for the S3 bucket. When enabled, it enforces secure practices for object uploads and HTTPS connections.                | false         | No       |
+| lifecycle_glacier_ir_object_prefix            | string             | Prefix of the identification of one or more objects to which the rule applies                                 | ""            | No       |
+| lifecycle_glacier_ir_transition_enabled       | bool               | Enable/disable lifecycle expiration of objects (e.g. `true` or `false`)                                      | false         | No       |
+| lifecycle_days_to_glacier_ir_transition       | number             | Specifies the number of days after object creation when the specific rule action takes effect                | 90            | No       |
+| lifecycle_days_to_expiration                  | number             | Specifies the number of days after object creation when the specific rule action takes effect                | 30            | No       |
+| lifecycle_days_to_glacier_transition          | number             | Specifies the number of days after object creation when the specific rule action takes effect                | 90            | No       |
+| lifecycle_days_to_infrequent_storage_transition| number             | Specifies the number of days after object creation when the specific rule action takes effect                | 60            | No       |
+| lifecycle_expiration_enabled                  | bool               | Enable/disable lifecycle expiration of objects (e.g. `true` or `false`)                                      | false         | No       |
+| lifecycle_expiration_object_prefix            | string             | Prefix of the identification of one or more objects to which the rule applies                                 | ""            | No       |
+| lifecycle_glacier_object_prefix               | string             | Prefix of the identification of one or more objects to which the rule applies                                 | ""            | No       |
+| lifecycle_glacier_transition_enabled          | bool               | Enable/disable lifecycle expiration of objects (e.g. `true` or `false`)                                      | false         | No       |
+| lifecycle_infrequent_storage_object_prefix    | string             | Prefix of the identification of one or more objects to which the rule applies                                 | ""            | No       |
+| lifecycle_infrequent_storage_transition_enabled| bool              | Enable/disable lifecycle expiration of objects (e.g. `true` or `false`)                                      | false         | No       |
+| versioning                                    | string             | Enable bucket versioning of objects: Enabled or Disabled                                                      | "Disabled"    | No       |
+| kms_master_key_id                             | string             | Set this to the value of the KMS key id. If this parameter is empty the default KMS master key is used       | ""            | No       |
+| custom_iam_s3_policy_statement                | list(map(string)) | List of custom policy statements.                                                                           | []            | No       |
+| force_destroy                                 | bool               | When true, forces the destruction of the S3 bucket and all its content. Use with caution.                    | false         | No       |
+| allowed_resource_arns                         | list(string)       | List of ARNs for allowed resources                                                                          | []            | No       |
+| enable_restricted_bucket_access               | bool               | Whether to run the policy for s3_restricted_access_ids                                                       | false         | No       |
+| enable_whitelists                             | bool               | Whether to enable IP whitelisting                                                                           | false         | No       |
+| generic_policy_entries                        | list(object({...}))| List of entries for the generic policy                                                                       | []            | No       |
+| ip_whitelist                                  | list(string)       | List of whitelisted IP addresses                                                                            | []            | No       |
+| vpc_ids_whitelist                             | list(string)       | List of VPC IDs to whitelist for S3 access                                                                  | []            | No       |
+| ip_whitelist_vpce                             | list(string)       | List of extra VPC Endpoint IDs to allow access to S3                                                        | []            | No       |
+| whitelist_actions                             | list(string)       | Actions that are denied by the whitelist                                                                    | ["s3:PutObject*", "s3:GetObject*"] | No       |
+| environment                                   | string             | S3 bucket environment (e.g. DEV/TEST/UAT/PROD)                                                              | ""            | No       |
+| enable_deny_unencrypted_object_uploads        | bool               | Whether to enforce Encrypted Object Uploads                                                                 | true          | No       |
+| additional_tags                               | map(string)        | A map of additional tags to add to the S3 bucket.                                                            | {}            | No       |
 
 ## Module outputs
 
