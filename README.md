@@ -9,8 +9,6 @@ For more detailed examples and use cases, check out the files in the how-to-usag
 
 ## Module Inputs
 
-Certainly! Here's the table of inputs for your S3 bucket module with an additional column for "required":
-
 | Variable                                      | Type               | Description                                                                                                 | Default       | Required |
 |-----------------------------------------------|--------------------|-------------------------------------------------------------------------------------------------------------|---------------|----------|
 | s3_bucket_name                                | string             | The name of the bucket                                                                                       | ""            | Yes      |
