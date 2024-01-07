@@ -1,68 +1,86 @@
-# m-portal-aws-s3-private-bucket
-This Terraform module facilitates the creation of an S3 bucket on AWS with customizable policies, storage transitions, and more. 
-**For additional resources, examples, and community engagement**, check out the portal [Cloud Collab Hub](https://cloudcollab.com) :cloud:.
+
+# A Terraform module to provision a private s3 Bucket
+
+This is a security hardened s3 module that follows the least privilege security model as described in the document [Cloud Data Platform (CDP) – Cloud Data Lake (CDL) - S3](https://gsp.worldpay.com/sites/DTS/Cloud_Data_Platform/_layouts/15/WopiFrame2.aspx?sourcedoc={df9b639d-a9e9-41e4-9eda-e7aa8b28e452}&action=view&wdAccPdf=0&wdparaid=5810107A)
 
 ## Usage
-**Loading...** ⌛
+```
+module "s3_private_bucket" {
+  source            = "git:ssh://git@github.devops.worldpay.local:EDP/tf-common-modules//s3"
+  s3_bucket_name    = "XXXXXXXXX-private_bucket"
+  versioning        = true
+  user_ingester_arns {
+      "arn:aws:iam:::users/salesforce" = ["s3:PutObject"]
+  }
+}
 
-For more detailed examples and use cases, check out the files in the how-to-usage directory. They provide additional scenarios and explanations for leveraging the features of the aws_s3_private_bucket module.
+module "s3_cloudtrail_bucket" {
+  source            = "git:ssh://git@github.devops.worldpay.local:EDP/tf-common-modules//s3"
+  s3_bucket_name    = "XXXXXXXXX-cloudtrail"
+  versioning     = true
+  enable_cloudtrail = true
+}
+```
 
-## Module Inputs
+A full working example can be found in [example/434844845806](https://github.devops.worldpay.local/EDP/tf-common-modules/tree/master/s3/example/434844845806) folder.
 
-| Variable                                      | Type               | Description                                                                                                 | Default       | Required |
-|-----------------------------------------------|--------------------|-------------------------------------------------------------------------------------------------------------|---------------|----------|
-| s3_bucket_name                                | string             | The name of the bucket                                                                                       | ""            | Yes      |
-| enable_default_policy                         | bool               | Enable or disable the default IAM policy for the S3 bucket. When enabled, it enforces secure practices for object uploads and HTTPS connections.                | false         | No       |
-| lifecycle_glacier_ir_object_prefix            | string             | Prefix of the identification of one or more objects to which the rule applies                                 | ""            | No       |
-| lifecycle_glacier_ir_transition_enabled       | bool               | Enable/disable lifecycle expiration of objects (e.g. `true` or `false`)                                      | false         | No       |
-| lifecycle_days_to_glacier_ir_transition       | number             | Specifies the number of days after object creation when the specific rule action takes effect                | 90            | No       |
-| lifecycle_days_to_expiration                  | number             | Specifies the number of days after object creation when the specific rule action takes effect                | 30            | No       |
-| lifecycle_days_to_glacier_transition          | number             | Specifies the number of days after object creation when the specific rule action takes effect                | 90            | No       |
-| lifecycle_days_to_infrequent_storage_transition| number             | Specifies the number of days after object creation when the specific rule action takes effect                | 60            | No       |
-| lifecycle_expiration_enabled                  | bool               | Enable/disable lifecycle expiration of objects (e.g. `true` or `false`)                                      | false         | No       |
-| lifecycle_expiration_object_prefix            | string             | Prefix of the identification of one or more objects to which the rule applies                                 | ""            | No       |
-| lifecycle_glacier_object_prefix               | string             | Prefix of the identification of one or more objects to which the rule applies                                 | ""            | No       |
-| lifecycle_glacier_transition_enabled          | bool               | Enable/disable lifecycle expiration of objects (e.g. `true` or `false`)                                      | false         | No       |
-| lifecycle_infrequent_storage_object_prefix    | string             | Prefix of the identification of one or more objects to which the rule applies                                 | ""            | No       |
-| lifecycle_infrequent_storage_transition_enabled| bool              | Enable/disable lifecycle expiration of objects (e.g. `true` or `false`)                                      | false         | No       |
-| versioning                                    | string             | Enable bucket versioning of objects: Enabled or Disabled                                                      | "Disabled"    | No       |
-| kms_master_key_id                             | string             | Set this to the value of the KMS key id. If this parameter is empty the default KMS master key is used       | ""            | No       |
-| custom_iam_s3_policy_statement                | list(map(string)) | List of custom policy statements.                                                                           | []            | No       |
-| force_destroy                                 | bool               | When true, forces the destruction of the S3 bucket and all its content. Use with caution.                    | false         | No       |
-| allowed_resource_arns                         | list(string)       | List of ARNs for allowed resources                                                                          | []            | No       |
-| enable_restricted_bucket_access               | bool               | Whether to run the policy for s3_restricted_access_ids                                                       | false         | No       |
-| enable_whitelists                             | bool               | Whether to enable IP whitelisting                                                                           | false         | No       |
-| generic_policy_entries                        | list(object({...}))| List of entries for the generic policy                                                                       | []            | No       |
-| ip_whitelist                                  | list(string)       | List of whitelisted IP addresses                                                                            | []            | No       |
-| vpc_ids_whitelist                             | list(string)       | List of VPC IDs to whitelist for S3 access                                                                  | []            | No       |
-| ip_whitelist_vpce                             | list(string)       | List of extra VPC Endpoint IDs to allow access to S3                                                        | []            | No       |
-| whitelist_actions                             | list(string)       | Actions that are denied by the whitelist                                                                    | ["s3:PutObject*", "s3:GetObject*"] | No       |
-| environment                                   | string             | S3 bucket environment (e.g. DEV/TEST/UAT/PROD)                                                              | ""            | No       |
-| enable_deny_unencrypted_object_uploads        | bool               | Whether to enforce Encrypted Object Uploads                                                                 | true          | No       |
-| additional_tags                               | map(string)        | A map of additional tags to add to the S3 bucket.                                                            | {}            | No       |
+__NOTE__:
 
-## Module outputs
+This module creates a private s3 bucket by utilizing the [Amazons S3 Block Public Access](https://docs.aws.amazon.com/AmazonS3/latest/dev/access-control-block-public-access.html). If an attempt is made to create a bucket policy with public bucket or object access it will fail.  That secures both the bucket and its contents from ever being made publically available.
 
-| Name            | Description                        |
-|-----------------|------------------------------------|
-| s3_attributes   | Attributes of the created S3 bucket |
+## Dependency
 
-## How to Use Output Attributes
+This module has the following dependencies which are required to be referenced:
 
-arn = module.example_s3_bucket.s3_attributes.arn
-**OR**
-arn = module.example_s3_bucket.s3_attributes["arn"]
+https://github.devops.worldpay.local/EDP/tf-aws-module-tag-label
 
-## License
+## Inputs
 
-This project is licensed under the MIT License - see the [MIT License](https://opensource.org/licenses/MIT) file for details.
+| Name                                                 | Description                                                                                                            |  Type   |  Default  | Required |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | :-----: | :-------: | :------: |
+| application                                          |                                                                                                                        | string  |    n/a    |   yes    |
+| common\_tags                                         |                                                                                                                        |   map   |  `<map>`  |    no    |
+| custom\_iam\_s3\_policy\_statement                   | Create a custom policy document - must be a implemented as a json document                                             | string  |   `""`    |    no    |
+| default\_bucket\_policy\_statement                   | A JSON IAM policy statement                                                                                            | string  |   `""`    |    no    |
+| enable\_cloudtrail                                   | Enabling CloudTrail will effectively invalidate all set    bucket permissions except those required for AWS CloudTrail | string  | `"false"` |    no    |
+| environment\_name                                    | Name of the Worldpay environment, eg TEST, DEVL, PPRD                                                                  | string  |    n/a    |   yes    |
+| force\_destroy                                       |                                                                                                                        | string  | `"false"` |    no    |
+| gitrepo                                              |                                                                                                                        | string  |    n/a    |   yes    |
+| instance\_names                                      |                                                                                                                        |  list   | `<list>`  |    no    |
+| kms\_master\_key\_id                                 | Set this to the value of the KMS key id. If this parameter is empty the default KMS master key is used                 | string  |   `""`    |    no    |
+| lifecycle\_days\_to\_expiration                      | Specifies the number of days after object creation when the specific rule action takes effect                          | string  |  `"30"`   |    no    |
+| lifecycle\_days\_to\_glacier\_transition             | Specifies the number of days after object creation when the specific rule action takes effect                          | string  |  `"90"`   |    no    |
+| lifecycle\_days\_to\_infrequent\_storage\_transition | Specifies the number of days after object creation when the specific rule action takes effect                          | string  |  `"60"`   |    no    |
+| lifecycle\_expiration\_enabled                       | Enable/disable lifecycle expiration of objects (e.g. `true` or `false`)                                                | string  | `"false"` |    no    |
+| lifecycle\_expiration\_object\_prefix                | Prefix of the identification of one or more objects to which the rule applies                                          | string  |   `""`    |    no    |
+| lifecycle\_glacier\_object\_prefix                   | Prefix of the identification of one or more objects to which the rule applies                                          | string  |   `""`    |    no    |
+| lifecycle\_glacier\_transition\_enabled              | Enable/disable lifecycle expiration of objects (e.g. `true` or `false`)                                                | string  | `"false"` |    no    |
+| lifecycle\_infrequent\_storage\_object\_prefix       | Prefix of the identification of one or more objects to which the rule applies                                          | string  |   `""`    |    no    |
+| lifecycle\_infrequent\_storage\_transition\_enabled  | Enable/disable lifecycle expiration of objects (e.g. `true` or `false`)                                                | string  | `"false"` |    no    |
+| replication\_configuration                           | Cross region replication configuation block                                                                            |  list   | `<list>`  |    no    |
+| role                                                 |                                                                                                                        | string  |    n/a    |   yes    |
+| s3\_bucket\_force\_destroy                           |                                                                                                                        | string  |    n/a    |   yes    |
+| s3\_bucket\_name                                     | The name of the bucket                                                                                                 | string  |   `""`    |    no    |
+| user\_cross\_account\_arns                           |                                                                                                                        |   map   |  `<map>`  |    no    |
+| user\_ingester\_arns                                 |                                                                                                                        |   map   |  `<map>`  |    no    |
+| versioning                                           | Enable bucket versioning of objects                                                                                    | string  | `"false"` |    no    |
+| enable_logging                                       | enable logging for the bucket                                                                                          | boolean |  `false`  |    no    |
+| logging_bucket                                       | Bucket to send logs to if enable_logging enabled                                                                       | string  |   `""`    |    no    |
+| contains_pii_data                                    | Identify whether this bucket containers PII data                                                                       | boolean |    n/a    |   yes    |
+| enable_restricted_bucket_access                      | Enables the policy to deny all GetObject requests except for IDs specified in s3_restricted_access_ids                 | boolean |  `false`  |    no    |
+| s3_restricted_access_ids                             | List of role / user IDs to allow access to GetObject from S3 bucket                                                    |  list   |   `[]`    |    no    |
+| enable_whitelists | Enable whitelist feature | boolean | false | no |
+| ip_whitelist_worldpay_ips | List of WorldPay IP addresses to whitelist | list | `["63.32.67.110/32"]` | no |
+| ip_whitelist_vpce | List of VPC Endpoint IDs to whitelist | list | `[]` | no |
+| vpc_ids_whitelist | VPC IDs to whitelist | list | `[]` | no |
 
-## Contributing
 
-Contributions are welcome! Please follow the guidance below for details on how to contribute to this project:
+## Outputs
 
-1. Fork the repository
-2. Create a new branch: `git checkout -b feature/your-feature-name`
-3. Commit your changes: `git commit -m 'Add some feature'`
-4. Push to the branch: `git push origin feature/your-feature-name`
-5. Open a pull request
+| Name                 | Description |
+| -------------------- | ----------- |
+| arn                  |             |
+| bucket\_domain\_name |             |
+| id                   |             |
+| region               |             |
+
