@@ -3,8 +3,9 @@ resource "aws_s3_bucket" "private_bucket" {
   force_destroy = var.force_destroy
 
   tags = merge(
-    var.additional_tags, var.environment,
-    tomap("Name", "${lower(var.s3_bucket_name)}")
+    var.additional_tags,
+    var.environment,
+    { "Name" = lower(var.s3_bucket_name) }
   )
 }
 
