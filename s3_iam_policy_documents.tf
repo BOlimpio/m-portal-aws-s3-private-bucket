@@ -15,7 +15,7 @@ data "aws_iam_policy_document" "deny_unencrypted_object_uploads" {
       sid       = "DenyIncorrectEncryptionHeader"
       effect    = "Deny"
       actions   = ["s3:PutObject"]
-      resources = ["${aws_s3_bucket.private_bucket[0].arn}/*"]
+      resources = ["${aws_s3_bucket.private_bucket.arn.arn}/*"]
 
     principals {
       identifiers = ["*"]
@@ -37,7 +37,7 @@ data "aws_iam_policy_document" "default" {
     sid    = "Default"
     effect = "Allow"
     actions = ["s3:PutObject"]
-    resources = ["${aws_s3_bucket.private_bucket[0].arn}/*"]
+    resources = ["${aws_s3_bucket.private_bucket.arn.arn}/*"]
 
     principals {
       type        = "AWS"
@@ -61,7 +61,7 @@ data "aws_iam_policy_document" "default" {
 
     effect    = "Deny"
     actions   = ["s3:*"]
-    resources = ["${aws_s3_bucket.private_bucket[0].arn}/*"]
+    resources = ["${aws_s3_bucket.private_bucket.arn.arn}/*"]
 
     condition {
       test     = "Bool"
@@ -89,8 +89,8 @@ data "aws_iam_policy_document" "access_control" {
     }
 
     resources = [
-      "${aws_s3_bucket.private_bucket[0].arn}",
-      "${aws_s3_bucket.private_bucket[0].arn}/*",
+      "${aws_s3_bucket.private_bucket.arn.arn}",
+      "${aws_s3_bucket.private_bucket.arn.arn}/*",
     ]
   }
 }
@@ -110,8 +110,8 @@ data "aws_iam_policy_document" "whitelists" {
     }
 
     resources = [
-      aws_s3_bucket.private_bucket[0].arn,
-      "${aws_s3_bucket.private_bucket[0].arn}/*",
+      aws_s3_bucket.private_bucket.arn.arn,
+      "${aws_s3_bucket.private_bucket.arn.arn}/*",
     ]
 
     effect = "Deny"
