@@ -1,11 +1,11 @@
 data "aws_iam_policy_document" "private" {
-  source_policy_documents = concat(
-    length(var.custom_iam_s3_policy_statement) > 0 ? [var.custom_iam_s3_policy_statement] : [],
-    var.enable_deny_unencrypted_object_uploads ? data.aws_iam_policy_document.deny_unencrypted_object_uploads.*.statement : [],
-    var.enable_default_policy ? data.aws_iam_policy_document.default.*.statement : [],
-    var.enable_restricted_bucket_access ? data.aws_iam_policy_document.access_control.*.statement : [],
-    var.enable_whitelists ? data.aws_iam_policy_document.whitelists.*.statement : [],
-  )
+  source_policy_documents = compact([
+    # length(var.custom_iam_s3_policy_statement) > 0 ? [var.custom_iam_s3_policy_statement] : [],
+    var.enable_deny_unencrypted_object_uploads ? data.aws_iam_policy_document.deny_unencrypted_object_uploads[0].json : [],
+    var.enable_default_policy ? data.aws_iam_policy_document.default[0].json : [],
+    var.enable_restricted_bucket_access ? data.aws_iam_policy_document.access_control[0].json : [],
+    var.enable_whitelists ? data.aws_iam_policy_document.whitelists[0].json : [],
+  ])
 }
 
 
@@ -15,7 +15,7 @@ data "aws_iam_policy_document" "deny_unencrypted_object_uploads" {
       sid       = "DenyIncorrectEncryptionHeader"
       effect    = "Deny"
       actions   = ["s3:PutObject"]
-      resources = ["${aws_s3_bucket.private_bucket.arn}/*"]
+      resources = ["${aws_s3_bucket.private_bucket[0].arn}/*"]
 
     principals {
       identifiers = ["*"]
@@ -37,7 +37,7 @@ data "aws_iam_policy_document" "default" {
     sid    = "Default"
     effect = "Allow"
     actions = ["s3:PutObject"]
-    resources = ["${aws_s3_bucket.private_bucket.arn}/*"]
+    resources = ["${aws_s3_bucket.private_bucket[0].arn}/*"]
 
     principals {
       type        = "AWS"
@@ -61,7 +61,7 @@ data "aws_iam_policy_document" "default" {
 
     effect    = "Deny"
     actions   = ["s3:*"]
-    resources = ["${aws_s3_bucket.private_bucket.arn}/*"]
+    resources = ["${aws_s3_bucket.private_bucket[0].arn}/*"]
 
     condition {
       test     = "Bool"
@@ -89,8 +89,8 @@ data "aws_iam_policy_document" "access_control" {
     }
 
     resources = [
-      "${aws_s3_bucket.private_bucket.arn}",
-      "${aws_s3_bucket.private_bucket.arn}/*",
+      "${aws_s3_bucket.private_bucket[0].arn}",
+      "${aws_s3_bucket.private_bucket[0].arn}/*",
     ]
   }
 }
@@ -110,8 +110,8 @@ data "aws_iam_policy_document" "whitelists" {
     }
 
     resources = [
-      aws_s3_bucket.private_bucket.arn,
-      "${aws_s3_bucket.private_bucket.arn}/*",
+      aws_s3_bucket.private_bucket[0].arn,
+      "${aws_s3_bucket.private_bucket[0].arn}/*",
     ]
 
     effect = "Deny"
