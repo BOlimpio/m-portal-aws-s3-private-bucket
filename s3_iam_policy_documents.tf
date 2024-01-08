@@ -1,13 +1,11 @@
 data "aws_iam_policy_document" "private" {
-  source_policy_documents = compact(
-    [
-      length(var.custom_iam_s3_policy_statement) > 0 ,
-      var.enable_deny_unencrypted_object_uploads ? data.aws_iam_policy_document.deny_unencrypted_object_uploads.*.statement : [],
-      var.enable_default_policy ? data.aws_iam_policy_document.default.*.statement : [],
-      var.enable_restricted_bucket_access ? data.aws_iam_policy_document.access_control.*.statement : [],
-      var.enable_whitelists ? data.aws_iam_policy_document.whitelists.*.statement : [],
-    ]
-  )
+  source_policy_documents = flatten([
+    length(var.custom_iam_s3_policy_statement) > 0 ? [var.custom_iam_s3_policy_statement] : [],
+    var.enable_deny_unencrypted_object_uploads ? [data.aws_iam_policy_document.deny_unencrypted_object_uploads.*.statement] : [],
+    var.enable_default_policy ? [data.aws_iam_policy_document.default.*.statement] : [],
+    var.enable_restricted_bucket_access ? [data.aws_iam_policy_document.access_control.*.statement] : [],
+    var.enable_whitelists ? [data.aws_iam_policy_document.whitelists.*.statement] : [],
+  ])
 }
 
 data "aws_iam_policy_document" "deny_unencrypted_object_uploads" {
