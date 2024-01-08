@@ -94,10 +94,23 @@ variable "kms_master_key_id" {
   default     = ""
 }
 
+# variable "custom_iam_s3_policy_statement" {
+#   type        = list(map(string))
+#   description = "List of custom policy statements."
+#   default     = []
+# }
+
 variable "custom_iam_s3_policy_statement" {
-  type        = list(map(string))
-  description = "List of custom policy statements."
-  default     = []
+  type        = list(object({
+    sid       = string
+    effect    = string
+    actions   = list(string)
+    resources = list(string)
+    principals = list(object({
+      type        = string
+      identifiers = list(string)
+    }))
+  }))
 }
 
 variable "force_destroy" {
