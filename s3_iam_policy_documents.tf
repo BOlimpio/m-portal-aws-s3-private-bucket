@@ -6,7 +6,6 @@ data "aws_iam_policy_document" "private" {
       var.enable_default_policy ? data.aws_iam_policy_document.default.*.statement : [],
       var.enable_restricted_bucket_access ? data.aws_iam_policy_document.access_control.*.statement : [],
       var.enable_whitelists ? data.aws_iam_policy_document.whitelists.*.statement : [],
-      var.generic_policy_entries ? data.aws_iam_policy_document.generic_policy.*.statement : [],
     ]
   )
 }
@@ -70,24 +69,6 @@ data "aws_iam_policy_document" "default" {
       variable = "aws:SecureTransport"
       values   = ["false"]
     }
-  }
-}
-
-data "aws_iam_policy_document" "generic_policy" {
-  count = length(var.generic_policy_entries)
-
-  statement {
-    principals {
-      type        = var.generic_policy_entries[count.index].principal_type
-      identifiers = var.generic_policy_entries[count.index].principal_ids
-    }
-
-    actions = var.generic_policy_entries[count.index].actions
-
-    resources = [
-      aws_s3_bucket.private_bucket.arn,
-      "${aws_s3_bucket.private_bucket.arn}/*",
-    ]
   }
 }
 
