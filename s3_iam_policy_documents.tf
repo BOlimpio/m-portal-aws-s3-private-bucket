@@ -31,7 +31,7 @@ data "aws_iam_policy_document" "deny_unencrypted_object_uploads" {
 }
 
 data "aws_iam_policy_document" "default" {
-  count = var.enable_default_policy ? 0 : 1
+  count = var.enable_default_policy ? 1 : 0
 
   statement {
     sid    = "Default"
