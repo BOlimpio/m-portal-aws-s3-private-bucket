@@ -8,10 +8,6 @@ data "aws_iam_policy_document" "private" {
   ])
 }
 
-data "aws_iam_policy_document" "custom_policy" {
-
-}
-
 data "aws_iam_policy_document" "deny_unencrypted_object_uploads" {
   count = var.enable_deny_unencrypted_object_uploads ? 1 : 0
     statement {
