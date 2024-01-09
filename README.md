@@ -40,7 +40,7 @@ https://github.devops.worldpay.local/EDP/tf-aws-module-tag-label
 | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | :-----: | :-------: | :------: |
 | application                                          |                                                                                                                        | string  |    n/a    |   yes    |
 | common\_tags                                         |                                                                                                                        |   map   |  `<map>`  |    no    |
-| attach\_custom\_policy                               | Flag to determine whether to attach a custom policy                                             | string  |   `""`    |    no    |
+| attach\_custom\_policy                               | Flag to determine whether to attach a custom policy                                             | bool  |   `false`    |    no    |
 | custom\_iam\_s3\_policy                              | Custom IAM policy for S3 - must be a implemented as a json document                                             | string  |   `""`    |    no    |
 | default\_bucket\_policy\_statement                   | A JSON IAM policy statement                                                                                            | string  |   `""`    |    no    |
 | enable\_cloudtrail                                   | Enabling CloudTrail will effectively invalidate all set    bucket permissions except those required for AWS CloudTrail | string  | `"false"` |    no    |
