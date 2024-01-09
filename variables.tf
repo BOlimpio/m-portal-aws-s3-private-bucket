@@ -100,18 +100,19 @@ variable "kms_master_key_id" {
 #   default     = []
 # }
 
-variable "custom_iam_s3_policy_statement" {
-  type        = list(object({
-    sid       = string
-    effect    = string
-    actions   = list(string)
-    resources = list(string)
-    principals = list(object({
-      type        = string
-      identifiers = list(string)
-    }))
-  }))
+variable "attach_custom_policy" {
+  description = "Flag to determine whether to attach a custom policy"
+  type        = bool
+  default     = false
 }
+
+variable "custom_iam_s3_policy" {
+  type        = string
+  description = "Custom IAM policy for S3"
+  default     = ""
+}
+
+
 
 variable "force_destroy" {
   type        = bool
