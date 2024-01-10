@@ -1,6 +1,6 @@
 data "aws_iam_policy_document" "private" {
   source_policy_documents = compact([
-    var.attach_custom_policy ? var.custom_iam_s3_policy : "",
+    //var.attach_custom_policy ? var.custom_iam_s3_policy : "",
     var.enable_deny_unencrypted_object_uploads ? data.aws_iam_policy_document.deny_unencrypted_object_uploads[0].json : "",
     var.enable_default_policy ? data.aws_iam_policy_document.default[0].json : "",
     var.enable_restricted_bucket_access ? data.aws_iam_policy_document.access_control[0].json : "",
