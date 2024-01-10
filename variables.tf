@@ -172,12 +172,6 @@ variable "whitelist_actions" {
   ]
 }
 
-variable "environment" {
-  description = "S3 bucket environment (e.g. DEV/TEST/UAT/PROD)"
-  type        = string
-  default     = ""
-}
-
 variable "enable_deny_unencrypted_object_uploads" {
   type        = bool
   description = "Whether to enforce Encrypted Object Uploads"

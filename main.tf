@@ -4,7 +4,7 @@ resource "aws_s3_bucket" "private_bucket" {
 
   tags = merge(
     var.additional_tags,
-    tomap({"Environment" = var.environment, "Name" = lower(var.s3_bucket_name)})
+    tomap({"Name" = lower(var.s3_bucket_name)})
   )
 }
 
