@@ -26,8 +26,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_sse" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "non_versioning_bucket_lifecycle" {
-  count = var.versioning == "Disabled" ? 1 : 0
-
   bucket = aws_s3_bucket.private_bucket.id
 
   rule {
