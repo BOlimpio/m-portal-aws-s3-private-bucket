@@ -94,12 +94,6 @@ variable "kms_master_key_id" {
   default     = ""
 }
 
-# variable "custom_iam_s3_policy_statement" {
-#   type        = list(map(string))
-#   description = "List of custom policy statements."
-#   default     = []
-# }
-
 variable "attach_custom_policy" {
   description = "Flag to determine whether to attach a custom policy"
   type        = bool
@@ -111,7 +105,6 @@ variable "custom_iam_s3_policy" {
   description = "Custom IAM policy for S3"
   default     = ""
 }
-
 
 
 variable "force_destroy" {
